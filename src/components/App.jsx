@@ -11,37 +11,71 @@ export const App = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [isError, setIsError] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
-  const [page, setPage] = useState(Number(1));
+  const [page, setPage] = useState(1);
   const [loadMore, setLoadMore] = useState(false);
+  // const [totalHits, setTotalHits] = useState(1);
 
   useEffect(() => {
     if (searchQuery === '') {
       return;
-    } else {
-      async function getImages() {
-        setIsLoading(true);
-        try {
-          const totalImg = await searchImg(page, searchQuery);
-
-          setImages(prevState => {
-            console.log(prevState);
-            return [...prevState, ...totalImg.hits];
-          });
-          if (page * 12 < totalImg.totalHits) {
-            setLoadMore(true);
-          }
-        } catch (error) {
-          setIsError(true);
-        } finally {
-          setIsLoading(false);
-        }
-      }
-      getImages();
     }
-  }, [page, searchQuery]);
+    async function getImages() {
+      setIsLoading(true);
+      setPage(1);
+      setImages([]);
 
-  const handleSearch = query => {
-    setSearchQuery(query);
+      try {
+        // setImages(prevState => {});
+
+        const totalImg = await searchImg(1, searchQuery);
+
+        setImages(prevState => [...prevState, ...totalImg.hits]);
+        // setTotalHits(totalImg.totalHits);
+        if (totalImg.totalHits > 12) {
+          setLoadMore(true);
+        }
+        console.log(totalImg.totalHits > 12);
+      } catch (error) {
+        setIsError(true);
+      } finally {
+        setIsLoading(false);
+      }
+    }
+    getImages();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [searchQuery]);
+
+  useEffect(() => {
+    if (searchQuery === '') {
+      return;
+    }
+    if (page === 1) {
+      return;
+    }
+    async function foo() {
+      try {
+        const totalImg = await searchImg(page, searchQuery);
+        console.log(totalImg);
+        if (page * 12 < totalImg.totalHits) {
+          setLoadMore(true);
+        } else {
+          // setPage(1);
+          setLoadMore(false);
+        }
+
+        setImages(prevState => [...prevState, ...totalImg.hits]);
+      } catch (error) {
+        setIsError(true);
+      } finally {
+        setIsLoading(false);
+      }
+    }
+    foo();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [page]);
+
+  const handleSearch = searchQuery => {
+    setSearchQuery(searchQuery);
   };
 
   const handlerClick = () => {

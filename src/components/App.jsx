@@ -34,7 +34,6 @@ export const App = () => {
         if (totalImg.totalHits > 12) {
           setLoadMore(true);
         }
-        console.log(totalImg.totalHits > 12);
       } catch (error) {
         setIsError(true);
       } finally {
@@ -55,7 +54,7 @@ export const App = () => {
     async function foo() {
       try {
         const totalImg = await searchImg(page, searchQuery);
-        console.log(totalImg);
+
         if (page * 12 < totalImg.totalHits) {
           setLoadMore(true);
         } else {
